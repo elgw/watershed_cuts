@@ -1,6 +1,15 @@
 #include "watershed_cuts.h"
-
 #include <stdio.h>
+
+
+/* Generalize by a function pointer to the image pixels
+* to edge function F?
+* Alternatives discussed in the paper are:
+* F(edge) = F({x,y}) = MIN(I(x), I(y)) which is used here
+* and F({x,y}) = |I(x)-I(y)|
+* No need to pre-compute F0, but that might be faster?
+* Cache-misses must be the main performance problem
+*/
 
 #define MIN(a,b)                                \
     ({ __typeof__ (a) _a = (a);                 \
@@ -60,6 +69,8 @@ static double * compute_F0(const double * restrict F,
         }
         F0[M-1 + M*ll] = MIN(F[M-2 + ll*M], F[M-1 + ll*M]);
     }
+    //printf("F0=\n");
+    show_double_matrix(F0, M, N);
 
     {
         size_t ll = 0;
@@ -94,13 +105,18 @@ static int find_neighbour(const size_t y, size_t * restrict _z,
                           const double * restrict F, const double * restrict F0,
                           const size_t M, const size_t N)
 {
+    // TODO:
+    // How to interpret F({x,y}) in line 6 of function stream?
+    // Either as F(x) AND F(y) or is it F on the edge between x and y?
     size_t m = y % M;
     size_t n = (y-m) / M;
     //printf("Any neighbor to %zu? = (%zu, %zu)\n", y, m, n);
     if(m > 0)
     {
         size_t z = y-1;
-        if( F[z] == F0[y] && F[y] == F0[y])
+        //if( F[z] == F0[y] && F[y] == F0[y])
+        if( MIN(F[z], F[y]) == F0[y])
+
         {
             if( P[z] != -1 )
             {
@@ -113,7 +129,8 @@ static int find_neighbour(const size_t y, size_t * restrict _z,
     if(m+1 < M)
     {
         size_t z = y+1;
-        if( F[z] == F0[y] && F[y] == F0[y])
+        if( MIN(F[z], F[y]) == F0[y])
+            //if( F[z] == F0[y] && F[y] == F0[y])
         {
             if(P[z] != -1)
             {
@@ -126,7 +143,8 @@ static int find_neighbour(const size_t y, size_t * restrict _z,
     if(n > 0)
     {
         size_t z = y - M;
-        if( F[z] == F0[y] && F[y] == F0[y])
+        if( MIN(F[z], F[y]) == F0[y])
+            //if( F[z] == F0[y] && F[y] == F0[y])
         {
             if( P[z] != -1 )
             {
@@ -139,7 +157,8 @@ static int find_neighbour(const size_t y, size_t * restrict _z,
     if(n+1 < N)
     {
         size_t z = y + M;
-        if( F[z] == F0[y] && F[y] == F0[y])
+        //if( F[z] == F0[y] && F[y] == F0[y])
+            if( MIN(F[z], F[y]) == F0[y])
         {
             if( P[z] != -1 )
             {
@@ -211,7 +230,7 @@ static int get_stream(const size_t x,
     /* New label */
     //printf("Asking for a new label (nL=%zu)\n", nL);
     *_nL = nL;
-    return 0;
+    return -1;
 }
 
 int * watershed_cuts(const double * F, size_t M, size_t N)
@@ -255,7 +274,7 @@ int * watershed_cuts(const double * F, size_t M, size_t N)
 #endif
             if(nL > 0)
             {
-                if(lab == 0)
+                if(lab == -1)
                 {
                     /* We create a new label */
                     nb_labs++;
@@ -266,8 +285,10 @@ int * watershed_cuts(const double * F, size_t M, size_t N)
                 {
                     P[L[ll]] = lab;
                 }
+                #if 0
                 show_int_matrix(P, M, N);
                 getchar();
+                #endif
             }
         }
     }
