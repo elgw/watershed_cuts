@@ -1,4 +1,20 @@
-An implementation of [^1].
+An implementation of [^1]. Note that there are some options:
+- 4-connectivity was used here, for 2D images.
+- The function on the edges, $F({x,y})$, being a function on the edge
+  ${x,y}$ connecting $x$ and $y$ can also be altered, this
+  implementation used
+
+$$
+F({x,y}) = \min \left( I(x) , I(y) \right)
+$$
+
+it was also suggested that
+$$
+F({x,y}) = | I(x) - I(y) |
+$$
+could be used.
+
+
 
 An obvious difference to the standard methods is that there is no
 contours around the labeled regions. However boundaries can of course
@@ -14,7 +30,7 @@ is an intrinsic difference or if I screwed up the implementation.
 
 
 A quick benchmark reveals that it is fast, here compared to the
-watershed implementation in MATLAB r2020b:
+watershed implementation in MATLAB R2020b:
 
 | n | watershed [s]| this [s] |
 | --- | --- | --- |
