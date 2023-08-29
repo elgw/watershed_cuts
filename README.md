@@ -23,30 +23,32 @@ could be used.
 
 ## Performance
 An obvious difference to the standard methods is that there is no
-contours around the labeled regions. However boundaries can of course
-be added if needed. Actually the boundaries are between the pixels so the
-depiction below sub optimal.
+contours around the labeled regions. The actual boundaries are on the
+edges, i.e., between the pixels. In the bottom-right image boundary
+pixels are artificially introduced (see **matlab/test_watershed_cuts.m**).
 
 <img src="doc/screenshot1.png">
 
-Also the behavior is different in the case seen below. Not sure if it
-is an intrinsic difference or if I screwed up the implementation.
+The behavior is different in the case seen below. However in this
+particular example it would be a simple thing to mask the output by
+the input.
 
 <img src="doc/screenshot2.png">
 
 
 A quick benchmark reveals that it is fast, here compared to the
-watershed implementation in MATLAB R2020b:
+watershed implementation in MATLAB R2020b, and the one in scikit-image
+(not exactly the same test image was used for scikit-image):
 
-| n | watershed [s]| this [s] |
-| --- | --- | --- |
-| 256 | 0.014 | 0.0011 |
-| 512 | 0.061 | 0.0036 |
-| 1024 | 0.26 | 0.016 |
-| 2048 | 1.8 | 0.76 |
-| 4096 | 9.8 | 0.33 |
-| 8192 | 49 | 1.3 |
+| n    | watershed [s] | scikit-image | this [s] |
+| ---  |    ---        |     ---      |   ---    |
+| 256  |  0.014        |   0.018      | 0.0011   |
+| 512  |  0.061        |   0.09       | 0.0036   |
+| 1024 |  0.26         |   0.73       | 0.016    |
+| 2048 |  1.8          |   5.5        | 0.76     |
+| 4096 |  9.8          |  32          | 0.33     |
+| 8192 | 49            | 170          | 1.3      |
 
 ## References
 
-[^1]:  Cousty, Jean and Bertrand, Gilles and Najman, Laurent and Couprie, Michel, Watershed Cuts: Minimum Spanning Forests and the Drop of Water Principle, IEEE Transactions on Pattern Analysis and Machine Intelligence, 2009 31(8), pp 1362-1374, [doi:10.1109/TPAMI.2008.173](http://dx.doi.org/10.1109/TPAMI.2008.173)
+[^1]: Cousty, Jean and Bertrand, Gilles and Najman, Laurent and Couprie, Michel, Watershed Cuts: Minimum Spanning Forests and the Drop of Water Principle, IEEE Transactions on Pattern Analysis and Machine Intelligence, 2009 31(8), pp 1362-1374, [doi:10.1109/TPAMI.2008.173](http://dx.doi.org/10.1109/TPAMI.2008.173)

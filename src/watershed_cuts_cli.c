@@ -54,9 +54,11 @@ int main(int argc, char ** argv)
         F[kk] = 7; //(double) rand() / (double) RAND_MAX;
     }
 
+    if(0){
     F[1] = 0;
     F[12] = 0;
     F[13] = 0;
+    }
 
     show_double_matrix(F, M, N);
     int * W = watershed_cuts(F, M, N);

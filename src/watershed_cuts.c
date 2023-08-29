@@ -3,13 +3,13 @@
 
 
 /* Generalize by a function pointer to the image pixels
-* to edge function F?
-* Alternatives discussed in the paper are:
-* F(edge) = F({x,y}) = MIN(I(x), I(y)) which is used here
-* and F({x,y}) = |I(x)-I(y)|
-* No need to pre-compute F0, but that might be faster?
-* Cache-misses must be the main performance problem
-*/
+ * to edge function F?
+ * Alternatives discussed in the paper are:
+ * F(edge) = F({x,y}) = MIN(I(x), I(y)) which is used here
+ * and F({x,y}) = |I(x)-I(y)|
+ * No need to pre-compute F0, but that might be faster?
+ * Cache-misses must be the main performance problem
+ */
 
 #define MIN(a,b)                                \
     ({ __typeof__ (a) _a = (a);                 \
@@ -17,6 +17,9 @@
         _a < _b ? _a : _b; })
 
 
+#define debugprint 0
+
+#if debugprint
 static void show_int_matrix(const int * I, size_t M, size_t N)
 {
     if(M*N > 100)
@@ -47,52 +50,52 @@ static void show_double_matrix(const double * I, size_t M, size_t N)
         printf("\n");
     }
 }
+#endif
 
-
-/* Return smallest value in the neighborhood of idx
-* TODO XXX this is probably not what they describe in the paper.
-* check p. 4 and make sure that you understand the example in Fig. 3
-*/
-static double * compute_F0(const double * restrict F,
+/* Note:
+ * this is based on F({x,y}) = min(I(x), I(y))
+ * where {x,y} is the edge connecting the vertices/pixels
+ * x, y
+ */
+static double * compute_F0_min(const double * restrict F,
                            const size_t M, const size_t N)
 {
+    /* Loop over the first dimension */
     double * F0 = malloc(M*N*sizeof(double));
     for(size_t ll = 0; ll < N; ll++)
     {
         F0[M*ll] = MIN(F[ll*M], F[1 + ll*M]);
-
         for(size_t kk = 1; kk+1 < M; kk++)
         {
-            F0[kk+M*ll] = MIN(
-                              MIN(F[kk-1 + ll*M], F[kk + ll*M]),
-                              F[kk+1 + ll*M]);
+            F0[kk+M*ll] = MIN(F[kk+1 + ll*M],
+                              MIN(F[kk-1 + ll*M],
+                                  F[kk + ll*M]));
         }
         F0[M-1 + M*ll] = MIN(F[M-2 + ll*M], F[M-1 + ll*M]);
     }
-    //printf("F0=\n");
-    show_double_matrix(F0, M, N);
 
+    /* Loop over the 2nd dimensions */
+
+
+    for(size_t kk = 0; kk < M; kk++)
     {
         size_t ll = 0;
-        for(size_t kk = 0; kk < M; kk++)
-        {
-            F0[kk+M*ll] = MIN(F0[kk+ll*M], F[kk+(ll+1)*M]);
-        }
-        ll = N-1;
-        for(size_t kk = 0; kk < M; kk++)
-        {
-            F0[kk+M*ll] = MIN(F0[kk+ll*M], F[kk+(ll-1)*M]);
-        }
+        F0[kk+M*ll] = MIN(F0[kk+ll*M], F[kk+(ll+1)*M]);
+    }
+
+    for(size_t kk = 0; kk < M; kk++)
+    {
+        size_t ll = N-1;
+        F0[kk+M*ll] = MIN(F0[kk+ll*M], F[kk+(ll-1)*M]);
     }
 
     for(size_t ll = 1; ll+1 < N; ll++)
     {
-
         for(size_t kk = 0; kk < M; kk++)
         {
-            F0[kk+M*ll] = MIN(
-                              MIN(F[kk + (ll-1)*M], F0[kk+ll*M]),
-                              F[kk+(ll+1)*M]);
+            F0[kk+M*ll] = MIN(F[kk+(ll+1)*M],
+                              MIN(F[kk + (ll-1)*M],
+                                  F0[kk+ll*M]));
         }
     }
     return F0;
@@ -158,7 +161,7 @@ static int find_neighbour(const size_t y, size_t * restrict _z,
     {
         size_t z = y + M;
         //if( F[z] == F0[y] && F[y] == F0[y])
-            if( MIN(F[z], F[y]) == F0[y])
+        if( MIN(F[z], F[y]) == F0[y])
         {
             if( P[z] != -1 )
             {
@@ -199,10 +202,10 @@ static int get_stream(const size_t x,
         int breadth_first = 1;
         while(breadth_first && find_neighbour(y, &z, P, F, Fo, M, N) )
         {
-           if(P[z] == -1)
-           {
-               printf("P[z] == -1!\n");
-           }
+            if(P[z] == -1)
+            {
+                printf("P[z] == -1!\n");
+            }
             //printf("z= %zu\n", z);
             if(P[z] > 0) // if already has a label
             {
@@ -241,21 +244,41 @@ int * watershed_cuts(const double * F, size_t M, size_t N)
      * Here we assume a 4-connected graph over the image
      **/
 
+    if(F == NULL)
+    {
+        return NULL;
+    }
+    if(M*N == 0)
+    {
+        return NULL;
+    }
+
     // \psi in the paper which will be the output
     // with a label for each pixel
     int * P = calloc(M*N, sizeof(int));
-    double * F0 = compute_F0(F, M, N);
 
+    /* F^o in the paper. MIN alternative
+     * This does not need to be pre-computed. I'm betting it is
+     * faster to do that.
+     */
+    double * F0 = compute_F0_min(F, M, N);
+
+    #if debugprint
     if(M*N < 100)
     {
         printf("F0=\n");
         show_double_matrix(F0, M, N);
     }
+    #endif
+
+    /* Temporary stacks for the stream calculations. Allocate to the
+    *  worst case scenario, i.e. all pixels in the stacks.
+    */
 
     size_t * L = malloc(M*N*sizeof(size_t));
     size_t * Lp = malloc(M*N*sizeof(size_t));
 
-    size_t nb_labs = 0;
+    size_t nb_labs = 0; /* Number of labels used */
     for(size_t kk = 0; kk < M*N; kk++)
     {
         if(P[kk] == 0)
@@ -266,7 +289,7 @@ int * watershed_cuts(const double * F, size_t M, size_t N)
                                  P,
                                  M, N,
                                  L, Lp, &nL);
-#if 0
+#if debugprint
             printf("nL = %zu, lab=%d\n", nL, lab);
             for(size_t kk=0 ; kk<nL; kk++)
                 printf("%zu ", L[kk]);
@@ -279,16 +302,17 @@ int * watershed_cuts(const double * F, size_t M, size_t N)
                     /* We create a new label */
                     nb_labs++;
                     lab = nb_labs;
+                    printf("Lab=%d\n", lab);
                 }
 
                 for(size_t ll = 0; ll < nL; ll++)
                 {
                     P[L[ll]] = lab;
                 }
-                #if 0
+#if debugprint
                 show_int_matrix(P, M, N);
                 getchar();
-                #endif
+#endif
             }
         }
     }
