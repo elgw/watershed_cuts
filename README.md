@@ -36,7 +36,7 @@ the input.
 <img src="doc/screenshot2.png">
 
 
-A quick benchmark on images of size $`\[n \times n\]`$ reveals that it
+A quick benchmark on images of size $`\left[n \times n\right]`$ reveals that it
 is fast, here compared to the watershed implementation in MATLAB
 R2020b, and the one in scikit-image (not exactly the same test image
 was used for scikit-image):
