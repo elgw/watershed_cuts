@@ -6,15 +6,15 @@ The paper presents some options for the implementer.
   $`\{x,y\}`$ connecting $x$ and $y$ can also be altered, this
   implementation uses
 
-  ``` math
-  F(\{x,y\}) = \min \left( I(x) , I(y) \right)
-  ```
+``` math
+F(\{x,y\}) = \min \left( I(x) , I(y) \right)
+```
 
   while it was also suggested that
 
-  ``` math
-  F(\{x,y\}) = | I(x) - I(y) |
-  ```
+``` math
+F(\{x,y\}) = | I(x) - I(y) |
+```
 
   could be used.
 
