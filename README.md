@@ -5,13 +5,17 @@ The paper presents some options for the implementer.
 - The function on the edges, $`F(\{x,y\})`$, being a function on the edge
   $`\{x,y\}`$ connecting $x$ and $y$ can also be altered, this
   implementation uses
+
   ``` math
   F(\{x,y\}) = \min \left( I(x) , I(y) \right)
   ```
+
   while it was also suggested that
+
   ``` math
   F(\{x,y\}) = | I(x) - I(y) |
   ```
+
   could be used.
 
 ## Performance
