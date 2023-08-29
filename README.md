@@ -9,9 +9,11 @@ F({x,y}) = \min \left( I(x) , I(y) \right)
 $$
 
 it was also suggested that
+
 $$
 F({x,y}) = | I(x) - I(y) |
 $$
+
 could be used.
 
 
