@@ -10,13 +10,13 @@ The paper presents some options for the implementer.
 F(\{x,y\}) = \min \left( I(x) , I(y) \right)
 ```
 
-  while it was also suggested that
+- Another option that was suggested, to stop the regions at the edges was:
 
 ``` math
 F(\{x,y\}) = | I(x) - I(y) |
 ```
 
-  could be used.
+
 
 ## Performance
 An obvious difference to the standard methods is that there is no
