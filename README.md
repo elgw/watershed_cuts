@@ -1,17 +1,17 @@
 An implementation of [^1]. Note that there are some options:
 - 4-connectivity was used here, for 2D images.
-- The function on the edges, $F({x,y})$, being a function on the edge
-  ${x,y}$ connecting $x$ and $y$ can also be altered, this
+- The function on the edges, $F(\{x,y\})$, being a function on the edge
+  $\{x,y\}$ connecting $x$ and $y$ can also be altered, this
   implementation used
 
 $$
-F({x,y}) = \min \left( I(x) , I(y) \right)
+F(\{x,y\}) = \min \left( I(x) , I(y) \right)
 $$
 
 it was also suggested that
 
 $$
-F({x,y}) = | I(x) - I(y) |
+F(\{x,y\}) = | I(x) - I(y) |
 $$
 
 could be used.
