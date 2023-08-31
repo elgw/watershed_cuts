@@ -61,7 +61,7 @@ int main(int argc, char ** argv)
     }
 
     show_double_matrix(F, M, N);
-    int * W = watershed_cuts(F, M, N);
+    int * W = watershed_cuts(F, M, N, 1);
     show_int_matrix(W, M, N);
 
     free(W);

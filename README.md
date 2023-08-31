@@ -1,7 +1,8 @@
-An implementation of the $`O(n)`$ watershed algorithm from [^1].
+An implementation of the $`O(n)`$ watershed algorithm from Cousty et al. [^1].
 
 The paper presents some options for the implementer.
-- This code uses 4-connectivity, and is only 2D images.
+- This code uses 4-connectivity, and is only 2D and 3D images. Since
+  the me
 - The function on the edges, $`F(\{x,y\})`$, being a function on the edge
   $`\{x,y\}`$ connecting $x$ and $y$ can also be altered, this
   implementation uses
@@ -16,20 +17,15 @@ F(\{x,y\}) = \min \left( I(x) , I(y) \right)
 F(\{x,y\}) = | I(x) - I(y) |
 ```
 
-
-
 ## Performance
-An obvious difference to the standard methods is that there is no
+An obvious difference to the standard methods is that there are no
 contours around the labeled regions. The actual boundaries are on the
 edges, i.e., between the pixels. In the bottom-right image boundary
 pixels are artificially introduced (see **matlab/test_watershed_cuts.m**).
 
 <img src="doc/screenshot1.png">
 
-The behavior is different in the case seen below. However in this
-particular example it would be a simple thing to mask the output by
-the input.
-
+Here is another example:
 <img src="doc/screenshot2.png">
 
 
@@ -49,9 +45,8 @@ was used for scikit-image):
 
 
 ## TODO
-- [ ] Test it
-- [ ] Implement also for 3D or the general case.
-- [ ] Support using a mask image
+- [ ] Test it a little more
+- [ ] Explore the options
 
 
 ## References

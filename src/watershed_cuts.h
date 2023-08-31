@@ -28,7 +28,7 @@
  * implementation. Other options are possible.
  *
  * Input:
- *   A "height matrix" of size [M x N] where M is the size of
+ *   A "height matrix" of size [M x N x P] where M is the size of
  *   the non-strided dimension.
  *
  * Output:
@@ -52,6 +52,7 @@
     WATERSHED_CUTS_VERSION_PATCH
 
 int *
-watershed_cuts(const double * I, size_t M, size_t N);
+watershed_cuts(const double * I,
+               size_t M, size_t N, size_t P);
 
 #endif
