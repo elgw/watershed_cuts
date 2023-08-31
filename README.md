@@ -1,38 +1,55 @@
-An implementation of the $`O(n)`$ watershed algorithm from Cousty et al. [^1].
+An implementation of the surprisingly simple $`O(n)`$ watershed
+algorithm from Cousty et al. [^1].
 
-The paper presents some options for the implementer.
-- This code uses 4-connectivity, and is only 2D and 3D images. Since
-  the me
-- The function on the edges, $`F(\{x,y\})`$, being a function on the edge
-  $`\{x,y\}`$ connecting $x$ and $y$ can also be altered, this
-  implementation uses
+The code in this repo is for images only and uses 4-connectivity in 2D and
+6-connectivity in 3D. The algorithm is more general than that, and is
+presented in the framework of undirected graphs.
+
+There are a few choices to make, one of them is how to define the
+function on the edges, $`F(\{x,y\})`$ where $`\{x,y\}`$ denotes the
+connecting vertex $x$ and $y$.
+
+This implementation uses
 
 ``` math
 F(\{x,y\}) = \min \left( I(x) , I(y) \right)
 ```
 
-- Another option that was suggested, to stop the regions at the edges was:
+while another suggested option was
 
 ``` math
 F(\{x,y\}) = | I(x) - I(y) |
 ```
 
+which has the property that it locates the boundaries of the watershed
+regions along image edges.
+
 ## Performance
-An obvious difference to the standard methods is that there are no
-contours around the labeled regions. The actual boundaries are on the
-edges, i.e., between the pixels. In the bottom-right image boundary
-pixels are artificially introduced (see **matlab/test_watershed_cuts.m**).
+An obvious difference to the standard watershed methods is the lack of
+contours or watersheds between labeled regions. The actual boundaries
+are on the graph edges, i.e., between the pixels.
+
+Below is an example image demonstrating the differences in output from
+the **watershed** method bundled with MATLAB. In the bottom-right
+image boundary pixels are artificially introduced (pixels set to 0
+when they differ from the erosion by a small structuring element, see
+**matlab/test_watershed_cuts.m**).
 
 <img src="doc/screenshot1.png">
 
-Here is another example:
+Here is another example, borrowed from the documentation of
+**watershed** showing the result of watershed cuts to the right.
+
 <img src="doc/screenshot2.png">
 
 
-A quick benchmark on images of size $`\left[n \times n\right]`$ reveals that it
-is fast, here compared to the watershed implementation in MATLAB
-R2020b, and the one in scikit-image (not exactly the same test image
-was used for scikit-image):
+A quick benchmark on images of size $`\left[n \times n\right]`$
+reveals that watershed cuts are as fast as advertised. Also much
+faster than methods typically in use. In the table below it is
+compared to the watershed implementation in MATLAB R2020b, and the one
+in scikit-image. Exactly the same image was used when comparing MATLAB
+to this implementation. For scikit-image similar, but not identical,
+images were used (see **python/benchmark_scikit-image.py**).
 
 | n    | watershed [s] | scikit-image [s] | this [s] |
 | ---  |    ---        |     ---          |   ---    |
