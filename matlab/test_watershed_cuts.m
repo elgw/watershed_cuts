@@ -1,13 +1,15 @@
 function test_watershed_cuts()
 build_watershed_cuts()
 
+keyboard
+
 demo_image1()
 demo_image2()
 demo_3d()
 
 fuzzing()
 
-benchmark_2d(2.^(4:10))
+benchmark_2d(2.^(4:12))
 benchmark_3d(2.^(4:7))
 end
 
@@ -60,6 +62,7 @@ for kk = 1:numel(N)
     w2 = watershed_cuts(I);
     t2=toc;
     T = cat(1, T, [n, t1, t2]);
+    fprintf('%d, %f, %f\n', n, t1, t2);
 end
 
 figure,

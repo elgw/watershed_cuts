@@ -51,15 +51,16 @@ in scikit-image [^3]. Exactly the same image was used when comparing MATLAB
 to this implementation. For scikit-image similar, but not identical,
 images were used (see **python/benchmark_scikit-image.py**).
 
-| n    | watershed [s] | scikit-image [s] | this [s] |
-| ---  |    ---        |     ---          |   ---    |
-| 256  |  0.014        |   0.018          | 0.0011   |
-| 512  |  0.061        |   0.09           | 0.0036   |
-| 1024 |  0.26         |   0.73           | 0.016    |
-| 2048 |  1.8          |   5.5            | 0.76     |
-| 4096 |  9.8          |  32              | 0.33     |
-| 8192 | 49            | 170              | 1.3      |
-
+| n     | watershed [s] | scikit-image [s] | this [s] |
+| ---   |    ---        |     ---          |   ---    |
+| 256   |  0.014        |   0.018          | 0.0011   |
+| 512   |  0.061        |   0.09           | 0.0036   |
+| 1024  |  0.26         |   0.73           | 0.016    |
+| 2048  |  1.8          |   5.5            | 0.76     |
+| 4096  |  9.8          |  32              | 0.33     |
+| 8192  | 49            | 170              | 1.3      |
+| 16384 | 270           |                  | 5.8      |
+| 32768 |               |                  | 24       |
 
 ## TODO
 - [ ] Test it a little more

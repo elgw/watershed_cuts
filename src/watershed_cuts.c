@@ -116,7 +116,7 @@ static double * compute_F0_min(const double * restrict F,
                 for(size_t kk = 0; kk<M; kk++)
                 {
                     F0[kk+M*ll + M*N*pp] = MIN( F[kk+ll*M + M*N*(pp+1)],
-                                                   F0[kk+ll*M + M*N*pp] );
+                                                F0[kk+ll*M + M*N*pp] );
                 }
             }
         }
@@ -150,64 +150,30 @@ static double * compute_F0_min(const double * restrict F,
     return F0;
 }
 
+
 #define NO_LABEL 0
 
-static int find_neighbour(const size_t y, size_t * restrict _z,
-                          const int * restrict PSI,
-                          const double * restrict F, const double * restrict F0,
-                          const size_t M, const size_t N, const size_t P)
+static int
+find_neighbour(const size_t y, size_t * restrict _z,
+               const int * restrict PSI,
+               const double * restrict F, const double * restrict F0,
+               const size_t M, const size_t N, const size_t P)
 {
 
     size_t m, n, p = 0;
 
-    //if(P == 1)
-        //{
-        //m = y % M;
-        //n = (y-m) / M;
-        //} else {
-        ldiv_t d = ldiv(y, M*N);
-        p = d.quot;
-        d = ldiv(y-p*M*N, M);
-        n = d.quot;
-        m = d.rem;
-        //}
-
-    if(m > 0)
-    {
-        size_t z = y-1;
-        //if( F[z] == F0[y] && F[y] == F0[y])
-        if( MIN(F[z], F[y]) == F0[y])
-
-        {
-            if( PSI[z] != -1 )
-            {
-                *_z = z;
-                return 1;
-            }
-        }
-    }
+    ldiv_t d = ldiv(y, M*N);
+    p = d.quot;
+    d = ldiv(y-p*M*N, M);
+    n = d.quot;
+    m = d.rem;
 
     if(m+1 < M)
     {
         size_t z = y+1;
         if( MIN(F[z], F[y]) == F0[y])
-            //if( F[z] == F0[y] && F[y] == F0[y])
         {
             if(PSI[z] != -1)
-            {
-                *_z = z;
-                return 1;
-            }
-        }
-    }
-
-    if(n > 0)
-    {
-        size_t z = y - M;
-        if( MIN(F[z], F[y]) == F0[y])
-            //if( F[z] == F0[y] && F[y] == F0[y])
-        {
-            if( PSI[z] != -1 )
             {
                 *_z = z;
                 return 1;
@@ -218,7 +184,49 @@ static int find_neighbour(const size_t y, size_t * restrict _z,
     if(n+1 < N)
     {
         size_t z = y + M;
-        //if( F[z] == F0[y] && F[y] == F0[y])
+        if( MIN(F[z], F[y]) == F0[y])
+        {
+            if( PSI[z] != -1 )
+            {
+                *_z = z;
+                return 1;
+            }
+        }
+    }
+
+    if(P > 1)
+    {
+        if(p+1 < P)
+        {
+            size_t z = y + M*N;
+            if( MIN(F[z], F[y]) == F0[y])
+            {
+                if( PSI[z] != -1 )
+                {
+                    *_z = z;
+                    return 1;
+                }
+            }
+        }
+    }
+
+    if(m > 0)
+    {
+        size_t z = y-1;
+        if( MIN(F[z], F[y]) == F0[y])
+
+        {
+            if( PSI[z] != -1 )
+            {
+                *_z = z;
+                return 1;
+            }
+        }
+    }
+
+    if(n > 0)
+    {
+        size_t z = y - M;
         if( MIN(F[z], F[y]) == F0[y])
         {
             if( PSI[z] != -1 )
@@ -235,7 +243,6 @@ static int find_neighbour(const size_t y, size_t * restrict _z,
         {
             size_t z = y - M*N;
             if( MIN(F[z], F[y]) == F0[y])
-                //if( F[z] == F0[y] && F[y] == F0[y])
             {
                 if( PSI[z] != -1 )
                 {
@@ -244,21 +251,6 @@ static int find_neighbour(const size_t y, size_t * restrict _z,
                 }
             }
         }
-
-        if(p+1 < P)
-        {
-            size_t z = y + M*N;
-            //if( F[z] == F0[y] && F[y] == F0[y])
-            if( MIN(F[z], F[y]) == F0[y])
-            {
-                if( PSI[z] != -1 )
-                {
-                    *_z = z;
-                    return 1;
-                }
-            }
-        }
-
     }
 
     return 0;
