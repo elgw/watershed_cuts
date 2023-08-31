@@ -30,7 +30,7 @@ contours or watersheds between labeled regions. The actual boundaries
 are on the graph edges, i.e., between the pixels.
 
 Below is an example image demonstrating the differences in output from
-the **watershed** method bundled with MATLAB. In the bottom-right
+the **watershed**[^2] method bundled with MATLAB. In the bottom-right
 image boundary pixels are artificially introduced (pixels set to 0
 when they differ from the erosion by a small structuring element, see
 **matlab/test_watershed_cuts.m**).
@@ -47,7 +47,7 @@ A quick benchmark on images of size $`\left[n \times n\right]`$
 reveals that watershed cuts are as fast as advertised. Also much
 faster than methods typically in use. In the table below it is
 compared to the watershed implementation in MATLAB R2020b, and the one
-in scikit-image. Exactly the same image was used when comparing MATLAB
+in scikit-image [^3]. Exactly the same image was used when comparing MATLAB
 to this implementation. For scikit-image similar, but not identical,
 images were used (see **python/benchmark_scikit-image.py**).
 
@@ -69,3 +69,5 @@ images were used (see **python/benchmark_scikit-image.py**).
 ## References
 
 [^1]: Cousty, Jean and Bertrand, Gilles and Najman, Laurent and Couprie, Michel, Watershed Cuts: Minimum Spanning Forests and the Drop of Water Principle, IEEE Transactions on Pattern Analysis and Machine Intelligence, 2009 31(8), pp 1362-1374, [doi:10.1109/TPAMI.2008.173](http://dx.doi.org/10.1109/TPAMI.2008.173)
+[^2]: [MATLAB watershed documentation](https://se.mathworks.com/help/images/ref/watershed.html)
+[^3]: [scikit-image documentation on watershed](https://scikit-image.org/docs/stable/api/skimage.segmentation.html#skimage.segmentation.watershed) there is also a [demo](https://scikit-image.org/docs/stable/auto_examples/segmentation/plot_watershed.html)
