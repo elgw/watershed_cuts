@@ -64,10 +64,11 @@ images were used (see **python/benchmark_scikit-image.py**).
 ## TODO
 - [ ] Test it a little more
 - [ ] Explore the options
-
+- [ ] What is there in DIPlib [^4]?
 
 ## References
 
 [^1]: Cousty, Jean and Bertrand, Gilles and Najman, Laurent and Couprie, Michel, Watershed Cuts: Minimum Spanning Forests and the Drop of Water Principle, IEEE Transactions on Pattern Analysis and Machine Intelligence, 2009 31(8), pp 1362-1374, [doi:10.1109/TPAMI.2008.173](http://dx.doi.org/10.1109/TPAMI.2008.173)
 [^2]: [MATLAB watershed documentation](https://se.mathworks.com/help/images/ref/watershed.html)
 [^3]: [scikit-image documentation on watershed](https://scikit-image.org/docs/stable/api/skimage.segmentation.html#skimage.segmentation.watershed) there is also a [demo](https://scikit-image.org/docs/stable/auto_examples/segmentation/plot_watershed.html)
+[^4]: [DIPlib watershed documentation](https://diplib.org/diplib-docs/segmentation.html)
