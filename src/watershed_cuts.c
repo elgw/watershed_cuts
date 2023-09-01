@@ -282,6 +282,7 @@ static int get_stream(const size_t x,
         // and z not in L
         size_t z = 0;
         int breadth_first = 1;
+        // Could this be replaced by a for loop over the 4 or 6 cases?
         while(breadth_first && find_neighbour(y, &z, PSI, F, Fo, M, N, P) )
         {
             if(PSI[z] == -1)
