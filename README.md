@@ -63,9 +63,9 @@ images were used (see **python/benchmark_scikit-image.py**).
 | 32768 |               |                  | 24       |
 
 ## TODO
-- [ ] Test it a little more
+- [ ] Test it properly, not just the speed.
 - [ ] Explore the options
-- [ ] What is there in DIPlib [^4]?
+- [ ] Add a comparison to the implementation in DIPlib [^4].
 
 ## References
 

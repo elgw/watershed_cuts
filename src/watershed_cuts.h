@@ -44,6 +44,10 @@
  * Erik Wernersson, 2023
  */
 
+#ifdef __cplusplus
+extern "C"{
+#endif
+
 #define WATERSHED_CUTS_VERSION_MAJOR "0"
 #define WATERSHED_CUTS_VERSION_MINOR "0"
 #define WATERSHED_CUTS_VERSION_PATCH "1"
@@ -54,5 +58,9 @@
 int *
 watershed_cuts(const double * I,
                size_t M, size_t N, size_t P);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
