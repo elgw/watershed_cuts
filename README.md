@@ -8,13 +8,14 @@ There are a few choices to make, one of them is how to define the
 function on the edges, $`F(\{x,y\})`$ where $`\{x,y\}`$ denotes the
 connecting vertex $x$ and $y$.
 
-This implementation uses
+This implementation use
 
 ``` math
 F(\{x,y\}) = \min \left( I(x) , I(y) \right)
 ```
 
-while another suggested option is
+which give the standard watershed behavior. Another option, suggested
+in the paper, is
 
 ``` math
 F(\{x,y\}) = | I(x) - I(y) |
