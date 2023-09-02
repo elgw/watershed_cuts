@@ -1,9 +1,6 @@
 #ifndef watershed_cuts_h_
 #define watershed_cuts_h_
 
-#include <stdlib.h>
-#include <string.h>
-
 /* An implementation of
  *
  * Cousty, Jean and Bertrand, Gilles and Najman, Laurent and Couprie, Michel,
@@ -27,6 +24,13 @@
  * provide results most similar to classical water shed
  * implementation. Other options are possible.
  *
+ * Faster on random data than on constant input due to the memory access pattern.
+ *
+ * Memory usage:
+ * M*N*P*3*sizeof(double) for storing L, Lp and Fo
+ * M*N*P*sizeof(int) for the output.
+ * so typically M*N*P*28 bytes.
+ *
  * Input:
  *   A "height matrix" of size [M x N x P] where M is the size of
  *   the non-strided dimension.
@@ -48,9 +52,12 @@
 extern "C"{
 #endif
 
+#include <stdlib.h>
+#include <string.h>
+
 #define WATERSHED_CUTS_VERSION_MAJOR "0"
 #define WATERSHED_CUTS_VERSION_MINOR "0"
-#define WATERSHED_CUTS_VERSION_PATCH "1"
+#define WATERSHED_CUTS_VERSION_PATCH "2"
 #define watershed_cuts_version WATERSHED_CUTS_VERSION_MAJOR "." \
     WATERSHED_CUTS_VERSION_MINOR "."                            \
     WATERSHED_CUTS_VERSION_PATCH

@@ -1,10 +1,8 @@
 #include "watershed_cuts.h"
-#include <assert.h>
 #include <stdio.h>
 
 
-/* Generalize by a function pointer to the image pixels
- * to edge function F?
+/*
  * Alternatives discussed in the paper are:
  * F(edge) = F({x,y}) = MIN(I(x), I(y)) which is used here
  * and F({x,y}) = |I(x)-I(y)|
@@ -12,46 +10,15 @@
  * Cache-misses must be the main performance problem
  */
 
-#define MIN(a,b)                                \
-    ({ __typeof__ (a) _a = (a);                 \
-        __typeof__ (b) _b = (b);                \
-        _a < _b ? _a : _b; })
 
-
-#define debugprint 0
-
-#if debugprint
-static void show_int_matrix(const int * I, size_t M, size_t N)
+static double MIN(const double x, const double y)
 {
-    if(M*N > 100)
-        return;
-
-    for(size_t kk = 0; kk < M; kk++)
+    if( x < y)
     {
-        for(size_t ll = 0 ; ll < N; ll++)
-        {
-            printf("%d ", I[kk + M*ll]);
-        }
-        printf("\n");
+        return x;
     }
+    return y;
 }
-
-static void show_double_matrix(const double * I, size_t M, size_t N)
-{
-    if(M*N > 100)
-        return;
-
-
-    for(size_t kk = 0; kk < M; kk++)
-    {
-        for(size_t ll = 0 ; ll < N; ll++)
-        {
-            printf("% .1f ", I[kk + M*ll]);
-        }
-        printf("\n");
-    }
-}
-#endif
 
 /* Note:
  * this is based on F({x,y}) = min(I(x), I(y))
@@ -151,14 +118,12 @@ static double * compute_F0_min(const double * restrict F,
 }
 
 
-#define NO_LABEL 0
-
 static int
-find_neighbour(const size_t y, size_t * restrict _z,
-               const int * restrict PSI,
-               const double * restrict F, const double * restrict F0,
-               const size_t M, const size_t N, const size_t P)
+find_neighbour_ids(size_t * restrict Z,
+                   const size_t y,
+                   const size_t M, const size_t N, const size_t P)
 {
+    size_t nZ = 0;
 
     size_t m, n, p = 0;
 
@@ -170,91 +135,39 @@ find_neighbour(const size_t y, size_t * restrict _z,
 
     if(m+1 < M)
     {
-        size_t z = y+1;
-        if( MIN(F[z], F[y]) == F0[y])
-        {
-            if(PSI[z] != -1)
-            {
-                *_z = z;
-                return 1;
-            }
-        }
+        Z[nZ++] = y+1;
     }
 
     if(n+1 < N)
     {
-        size_t z = y + M;
-        if( MIN(F[z], F[y]) == F0[y])
-        {
-            if( PSI[z] != -1 )
-            {
-                *_z = z;
-                return 1;
-            }
-        }
+        Z[nZ++] = y + M;
+    }
+
+    if(m > 0)
+    {
+        Z[nZ++] = y - 1;
+    }
+
+    if(n > 0)
+    {
+        Z[nZ++] = y - M;
     }
 
     if(P > 1)
     {
         if(p+1 < P)
         {
-            size_t z = y + M*N;
-            if( MIN(F[z], F[y]) == F0[y])
-            {
-                if( PSI[z] != -1 )
-                {
-                    *_z = z;
-                    return 1;
-                }
-            }
+            Z[nZ++] = y + M*N;
         }
-    }
-
-    if(m > 0)
-    {
-        size_t z = y-1;
-        if( MIN(F[z], F[y]) == F0[y])
-
-        {
-            if( PSI[z] != -1 )
-            {
-                *_z = z;
-                return 1;
-            }
-        }
-    }
-
-    if(n > 0)
-    {
-        size_t z = y - M;
-        if( MIN(F[z], F[y]) == F0[y])
-        {
-            if( PSI[z] != -1 )
-            {
-                *_z = z;
-                return 1;
-            }
-        }
-    }
-
-    if(P > 1)
-    {
         if(p > 0)
         {
-            size_t z = y - M*N;
-            if( MIN(F[z], F[y]) == F0[y])
-            {
-                if( PSI[z] != -1 )
-                {
-                    *_z = z;
-                    return 1;
-                }
-            }
+            Z[nZ++] = y - M*N;
         }
     }
 
-    return 0;
+    return nZ;
 }
+
 
 static int get_stream(const size_t x,
                       const double * restrict F,
@@ -273,23 +186,27 @@ static int get_stream(const size_t x,
     L[nL++] = x;
     PSI[x] = -1; // temporary label
     Lp[nLp++] = x;
+    size_t Z[6];
 
     while(nLp > 0)
     {
         size_t y = Lp[--nLp]; // pop
 
-        // z is neighbour to y such that F({y,z}) == Fo(y)
-        // and z not in L
-        size_t z = 0;
-        int breadth_first = 1;
-        // Could this be replaced by a for loop over the 4 or 6 cases?
-        while(breadth_first && find_neighbour(y, &z, PSI, F, Fo, M, N, P) )
+        size_t nZ = find_neighbour_ids(Z, y, M, N, P);
+        for(size_t kk = 0; kk < nZ; kk++)
         {
-            if(PSI[z] == -1)
+            size_t z = Z[kk];
+
+            if( PSI[z] == -1 )
             {
-                printf("P[z] == -1!\n");
+                continue;
             }
-            //printf("z= %zu\n", z);
+
+            if( MIN(F[z], F[y]) != Fo[y] )
+            {
+                continue;
+            }
+
             if(PSI[z] > 0) // if already has a label
             {
                 /* Merge with existing label */
@@ -307,11 +224,12 @@ static int get_stream(const size_t x,
                 //printf("Fo[z] < Fo[y]\n");
                 nLp = 1; // reset
                 Lp[0] = z;
-                breadth_first = 0;
+                break;
             } else {
                 Lp[nLp++] = z; // push
             }
         }
+
     }
     /* New label */
     //printf("Asking for a new label (nL=%zu)\n", nL);
@@ -347,14 +265,6 @@ int * watershed_cuts(const double * F,
      */
     double * F0 = compute_F0_min(F, M, N, P);
 
-#if debugprint
-    if(M*N < 100)
-    {
-        printf("F0=\n");
-        show_double_matrix(F0, M, N);
-    }
-#endif
-
     /* Temporary stacks for the stream calculations. Allocate to the
      *  worst case scenario, i.e. all pixels in the stacks.
      */
@@ -373,12 +283,7 @@ int * watershed_cuts(const double * F,
                                  PSI,
                                  M, N, P,
                                  L, Lp, &nL);
-#if debugprint
-            printf("nL = %zu, lab=%d\n", nL, lab);
-            for(size_t kk=0 ; kk<nL; kk++)
-                printf("%zu ", L[kk]);
-            printf("\n");
-#endif
+
             if(nL > 0)
             {
                 if(lab == -1)
@@ -393,10 +298,6 @@ int * watershed_cuts(const double * F,
                 {
                     PSI[L[ll]] = lab;
                 }
-#if debugprint
-                show_int_matrix(PSI, M, N);
-                getchar();
-#endif
             }
         }
     }

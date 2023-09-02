@@ -1,16 +1,19 @@
 function test_watershed_cuts()
 build_watershed_cuts()
+%close all
 
-keyboard
+%keyboard
 
 demo_image1()
 demo_image2()
+
 demo_3d()
 
 fuzzing()
 
-benchmark_2d(2.^(4:12))
-benchmark_3d(2.^(4:7))
+benchmark_2d(2.^(4:12), 1)
+benchmark_3d(2.^(7:9))
+
 end
 
 function fuzzing()
@@ -48,19 +51,39 @@ assert(gotError);
 
 end
 
-function benchmark_2d(N)
+function benchmark_2d(N, simpleImage)
+disp('--> benchmark_2d')
+if(simpleImage)
+    disp('Using simple=constant image')
+else
+    disp('Using random image')
+end
+disp('Iter, watershed [s], watershed_cuts [s]')
 T = [];
+
 
 for kk = 1:numel(N)
     n = N(kk);
-    I = 256*rand(n, n);
-    I = gsmooth(I, 2, 'normalize');
+    
+    if simpleImage == 1
+        I = ones(n, n);
+    else
+        rng(1)
+        I = 256*rand(n, n);
+        %I = gsmooth(I, 2, 'normalize');
+    end
+    
+    t1 = -1;
+    if n < 32768
     tic
     w1 = watershed(I);
     t1 = toc;
+    end
     tic
+    for kk = 1:10
     w2 = watershed_cuts(I);
-    t2=toc;
+    end
+    t2=toc/10;
     T = cat(1, T, [n, t1, t2]);
     fprintf('%d, %f, %f\n', n, t1, t2);
 end
@@ -80,20 +103,36 @@ ylabel('Speedup')
  
 end
 
-function benchmark_3d(N)
+function benchmark_3d(N, simpleImage)
+disp('--> benchmark_3d')
+for simpleImage = 0:1
+if(simpleImage)
+    disp('Using simple=constant image')
+else
+    disp('Using random image')
+end
+
 T = [];
 
 for kk = 1:numel(N)
     n = N(kk);
-    I = 256*rand(n, n, n);
-    I = gsmooth(I, 2, 'normalize');
+    if simpleImage
+        I = ones(n, n, n);
+    else
+        rng(1)
+        I = 256*rand(n, n, n);
+    end
+    t1 = -1;
+
     tic
     w1 = watershed(I);
     t1 = toc;
+
     tic
     w2 = watershed_cuts(I);
     t2=toc;
     T = cat(1, T, [n, t1, t2]);
+    fprintf('it%d, MATLAB %f, WSC %f\n', n, t1, t2);
 end
 
 figure,
@@ -110,7 +149,8 @@ plot(T(:,1), T(:,2)./T(:,3))
 xlabel('side length [pixels]');
 ylabel('Speedup')
 title('3D')
- 
+end
+
 end
 
 
