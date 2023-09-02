@@ -60,7 +60,10 @@ cache-misses in the latter case.
 | 512   | 19          | 150         | 11       | 5.2      |
 
 
-## References and alternative implementation
+You are free to use this code and I'd be happy to receive any
+feedback. Most likely you would prefer something more well-tested,
+like the implementation in scikit-image for Python [^3] or the one in
+DIPlib [^4].
 
 [^1]: Cousty, Jean and Bertrand, Gilles and Najman, Laurent and Couprie, Michel, Watershed Cuts: Minimum Spanning Forests and the Drop of Water Principle, IEEE Transactions on Pattern Analysis and Machine Intelligence, 2009 31(8), pp 1362-1374, [doi:10.1109/TPAMI.2008.173](http://dx.doi.org/10.1109/TPAMI.2008.173) see also [https://perso.esiee.fr/~coustyj/]
 [^2]: [MATLAB watershed documentation](https://se.mathworks.com/help/images/ref/watershed.html)
