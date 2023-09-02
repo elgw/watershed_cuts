@@ -12,7 +12,7 @@ demo_3d()
 fuzzing()
 
 benchmark_2d(2.^(4:12), 1)
-benchmark_3d(2.^(7:9))
+benchmark_3d(2.^(7:10))
 
 end
 

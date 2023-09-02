@@ -4,21 +4,32 @@
 #include "diplib/morphology.h"
 #include "watershed_cuts.h"
 
-double clockdiff(struct timespec* end, struct timespec * start)
+double
+clockdiff(struct timespec* end, struct timespec * start)
 {
     double elapsed = (end->tv_sec - start->tv_sec);
     elapsed += (end->tv_nsec - start->tv_nsec) / 1000000000.0;
     return elapsed;
 }
 
-static void time_size(size_t M, size_t N, size_t P)
+static void
+time_size(size_t M, size_t N, size_t P,
+                      int imtype)
 {
     struct timespec tstart, tend;
 
     double * F = (double *) malloc(M*N*P*sizeof(double));
+    if(imtype == 0)
+    {
     for(size_t kk = 0; kk<M*N*P; kk++)
     {
         F[kk] = 0;
+    }
+    } else {
+        for(size_t kk = 0; kk<M*N*P; kk++)
+        {
+            F[kk] = (double) rand() / (double) RAND_MAX;
+        }
     }
 
     F[0] = -1;
@@ -46,7 +57,7 @@ static void time_size(size_t M, size_t N, size_t P)
     dip::bin * mask_pixels = (dip::bin*)  mask.Origin();
     for(size_t kk = 0; kk < M*N*P; kk++)
     {
-        in_pixels[kk] = (double) rand() / (double) RAND_MAX;
+        in_pixels[kk] = F[kk];
         mask_pixels[kk] = 1;
     }
     free(F);
@@ -68,7 +79,10 @@ int main()
 
     for(size_t N = 16; N <= 512; N*=2)
     {
-        time_size(N, N, N);
+        printf("flat image\n");
+        time_size(N, N, N, 0);
+        printf("rand image\n");
+        time_size(N, N, N, 1);
     }
 
     return EXIT_SUCCESS;

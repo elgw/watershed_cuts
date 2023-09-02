@@ -47,23 +47,21 @@ n\right]`$ reveals that WSC has a competitive
 performance.
 
 In the table below this implementation of WSC is compared to the
-watershed implementation in MATLAB R2020b. Using two types of images:
-"flat", where all pixels are set to 0 and "rand" where pixels got a
-random value. Timing are reported in seconds. Interestingly, WSC is
-faster on complex images than on simple, this is due to more
-cache-misses in the latter case.
+watershed implementation in MATLAB R2020b and he one in DIPlib
+[^4]. Using two types of images: "flat", where all pixels are set to 0
+and "rand" where pixels got a random value. Timing are reported in
+seconds. Interestingly, WSC is faster on complex images than on
+simple, this is due to more cache-misses in the latter case.
 
-| n     | MATLAB/flat | MATLAB/rand | WSC/flat | WSC/rand |
-| ---   | ---         | ---         | ---      | ---      |
-| 128   | 0.31        | 1.3         | 0.11     | 0.060    |
-| 256   | 2.3         | 15          | 1.2      | 0.52     |
-| 512   | 19          | 150         | 11       | 5.2      |
+| n     | MATLAB/flat | MATLAB/rand | WSC/flat | WSC/rand | DIPlib/flat | DIPlib/rand |
+| ---   | ---         | ---         | ---      | ---      | ---         | ---         |
+| 128   | 0.31        | 1.3         | 0.11     | 0.060    | 0.072       | 0.47        |
+| 256   | 2.3         | 15          | 1.2      | 0.52     | 0.65        | 6.3         |
+| 512   | 19          | 150         | 11       | 5.2      | 5.3         | 64          |
 
 
-You are free to use this code and I'd be happy to receive any
-feedback. Most likely you would prefer something more well-tested,
-like the implementation in scikit-image for Python [^3] or the one in
-DIPlib [^4].
+At some point it could be interesting to compare this to the
+implementation scikit-image for Python [^3].
 
 [^1]: Cousty, Jean and Bertrand, Gilles and Najman, Laurent and Couprie, Michel, Watershed Cuts: Minimum Spanning Forests and the Drop of Water Principle, IEEE Transactions on Pattern Analysis and Machine Intelligence, 2009 31(8), pp 1362-1374, [doi:10.1109/TPAMI.2008.173](http://dx.doi.org/10.1109/TPAMI.2008.173) see also [https://perso.esiee.fr/~coustyj/]
 [^2]: [MATLAB watershed documentation](https://se.mathworks.com/help/images/ref/watershed.html)
