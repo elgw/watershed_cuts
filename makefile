@@ -1,6 +1,13 @@
-CC=gcc -std=c11
-CFLAGS=-g3 -Wall -Wextra
+CC=gcc -std=gnu11
+CFLAGS=-Wall -Wextra -pedantic
 LDFLAGS=-flto
+
+DEBUG?=0
+ifeq ($(DEBUG), 0)
+   CFLAGS+=-O3 -DNDEBUG
+else
+   CFLAGS+=-g3
+endif
 
 FILES=src/watershed_cuts_cli.c watershed_cuts.o
 watershed_cuts: $(FILES)
