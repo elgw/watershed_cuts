@@ -44,7 +44,7 @@ void mexFunction(int nlhs, mxArray *plhs[],int nrhs, const mxArray *prhs[])
     {
         _D[kk] = W[kk];
     }
-
+    free(W);
 
     return;
 }
