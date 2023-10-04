@@ -26,16 +26,16 @@ static double MIN(const double x, const double y)
  * x, y
  */
 static double * compute_F0_min(const double * restrict F,
-                               const size_t M, const size_t N, const size_t P)
+                               const uint64_t M, const uint64_t N, const uint64_t P)
 {
     /* Loop over the first dimension */
     double * F0 = malloc(M*N*P*sizeof(double));
-    for(size_t pp = 0; pp < P; pp++)
+    for(uint64_t pp = 0; pp < P; pp++)
     {
-        for(size_t ll = 0; ll < N; ll++)
+        for(uint64_t ll = 0; ll < N; ll++)
         {
             F0[M*ll + M*N*pp] = MIN(F[ll*M + M*N*pp], F[1 + ll*M + M*N*pp]);
-            for(size_t kk = 1; kk+1 < M; kk++)
+            for(uint64_t kk = 1; kk+1 < M; kk++)
             {
                 F0[kk+M*ll + M*N*pp] = MIN(F[kk+1 + ll*M + M*N*pp],
                                            MIN(F[kk-1 + ll*M + M*N*pp],
@@ -47,25 +47,25 @@ static double * compute_F0_min(const double * restrict F,
     }
     /* Loop over the 2nd dimensions */
 
-    for(size_t pp = 0; pp < P; pp++)
+    for(uint64_t pp = 0; pp < P; pp++)
     {
-        for(size_t kk = 0; kk < M; kk++)
+        for(uint64_t kk = 0; kk < M; kk++)
         {
-            size_t ll = 0;
+            uint64_t ll = 0;
             F0[kk+M*ll + M*N*pp] = MIN(F0[kk+ll*M + M*N*pp],
                                        F[kk+(ll+1)*M + M*N*pp]);
         }
 
-        for(size_t kk = 0; kk < M; kk++)
+        for(uint64_t kk = 0; kk < M; kk++)
         {
-            size_t ll = N-1;
+            uint64_t ll = N-1;
             F0[kk+M*ll + M*N*pp] = MIN(F0[kk+ll*M + M*N*pp],
                                        F[kk+(ll-1)*M + M*N*pp]);
         }
 
-        for(size_t ll = 1; ll+1 < N; ll++)
+        for(uint64_t ll = 1; ll+1 < N; ll++)
         {
-            for(size_t kk = 0; kk < M; kk++)
+            for(uint64_t kk = 0; kk < M; kk++)
             {
                 F0[kk+M*ll + M*N*pp] = MIN(F[kk+(ll+1)*M + M*N*pp],
                                            MIN(F[kk + (ll-1)*M + M*N*pp],
@@ -76,11 +76,11 @@ static double * compute_F0_min(const double * restrict F,
 
     if(P > 1)
     {
-        for(size_t pp = 0; pp<1; pp++)
+        for(uint64_t pp = 0; pp<1; pp++)
         {
-            for(size_t ll = 0; ll<N; ll++)
+            for(uint64_t ll = 0; ll<N; ll++)
             {
-                for(size_t kk = 0; kk<M; kk++)
+                for(uint64_t kk = 0; kk<M; kk++)
                 {
                     F0[kk+M*ll + M*N*pp] = MIN( F[kk+ll*M + M*N*(pp+1)],
                                                 F0[kk+ll*M + M*N*pp] );
@@ -88,11 +88,11 @@ static double * compute_F0_min(const double * restrict F,
             }
         }
 
-        for(size_t pp = 1; pp+1<P; pp++)
+        for(uint64_t pp = 1; pp+1<P; pp++)
         {
-            for(size_t ll = 0; ll<N; ll++)
+            for(uint64_t ll = 0; ll<N; ll++)
             {
-                for(size_t kk = 0; kk<M; kk++)
+                for(uint64_t kk = 0; kk<M; kk++)
                 {
                     F0[kk+M*ll + M*N*pp] = MIN(F[kk+ll*M + M*N*(pp-1)],
                                                MIN(F[kk+ll*M + M*N*(pp+1)],
@@ -101,11 +101,11 @@ static double * compute_F0_min(const double * restrict F,
             }
         }
 
-        for(size_t pp = P-1; pp<P; pp++)
+        for(uint64_t pp = P-1; pp<P; pp++)
         {
-            for(size_t ll = 0; ll<N; ll++)
+            for(uint64_t ll = 0; ll<N; ll++)
             {
-                for(size_t kk = 0; kk<M; kk++)
+                for(uint64_t kk = 0; kk<M; kk++)
                 {
                     F0[kk+M*ll + M*N*pp] = MIN( F[kk+ll*M + M*N*(pp-1)],
                                                 F0[kk+ll*M + M*N*pp] );
@@ -118,14 +118,14 @@ static double * compute_F0_min(const double * restrict F,
 }
 
 
-static int
-find_neighbour_ids(size_t * restrict Z,
-                   const size_t y,
-                   const size_t M, const size_t N, const size_t P)
+static int64_t
+find_neighbour_ids(uint64_t * restrict Z,
+                   const uint64_t y,
+                   const uint64_t M, const uint64_t N, const uint64_t P)
 {
-    size_t nZ = 0;
+    uint64_t nZ = 0;
 
-    size_t m, n, p = 0;
+    uint64_t m, n, p = 0;
 
     ldiv_t d = ldiv(y, M*N);
     p = d.quot;
@@ -169,33 +169,33 @@ find_neighbour_ids(size_t * restrict Z,
 }
 
 
-static int get_stream(const size_t x,
+static int64_t get_stream(const uint64_t x,
                       const double * restrict F,
                       const double * restrict Fo,
-                      int * restrict PSI,
-                      const size_t M, const size_t N, const size_t P,
-                      size_t * restrict L, size_t * restrict Lp, size_t * _nL)
+                      int64_t * restrict PSI,
+                      const uint64_t M, const uint64_t N, const uint64_t P,
+                      uint64_t * restrict L, uint64_t * restrict Lp, uint64_t * _nL)
 {
     // x is the start pixel
     // Lp is s stack for pixels to visit
     // L is a stack for the pixels in the stream
 
-    size_t nL = 0; // Empty stream
-    size_t nLp = 0;
+    uint64_t nL = 0; // Empty stream
+    uint64_t nLp = 0;
 
     L[nL++] = x;
     PSI[x] = -1; // temporary label
     Lp[nLp++] = x;
-    size_t Z[6];
+    uint64_t Z[6];
 
     while(nLp > 0)
     {
-        size_t y = Lp[--nLp]; // pop
+        uint64_t y = Lp[--nLp]; // pop
 
-        size_t nZ = find_neighbour_ids(Z, y, M, N, P);
-        for(size_t kk = 0; kk < nZ; kk++)
+        uint64_t nZ = find_neighbour_ids(Z, y, M, N, P);
+        for(uint64_t kk = 0; kk < nZ; kk++)
         {
-            size_t z = Z[kk];
+            uint64_t z = Z[kk];
 
             if( PSI[z] == -1 )
             {
@@ -237,8 +237,8 @@ static int get_stream(const size_t x,
     return -1;
 }
 
-int * watershed_cuts(const double * F,
-                     size_t M, size_t N, size_t P)
+int watershed_cuts_pre(int64_t * restrict PSI, const double * F,
+                     uint64_t M, uint64_t N, uint64_t P)
 {
     /* Actual input:
      * (V,E) -- defines a graph
@@ -248,16 +248,20 @@ int * watershed_cuts(const double * F,
 
     if(F == NULL)
     {
-        return NULL;
+        return EXIT_FAILURE;
     }
-    if(M*N == 0)
+    if(PSI == NULL)
     {
-        return NULL;
+        return EXIT_FAILURE;
     }
 
-    // \psi in the paper which will be the output
+    if(M*N == 0)
+    {
+        return EXIT_FAILURE;
+    }
+
+    // PSI is \psi in the paper which will be the output
     // with a label for each pixel
-    int * PSI = calloc(M*N*P, sizeof(int));
 
     /* F^o in the paper. MIN alternative
      * This does not need to be pre-computed. I'm betting it is
@@ -269,16 +273,16 @@ int * watershed_cuts(const double * F,
      *  worst case scenario, i.e. all pixels in the stacks.
      */
 
-    size_t * L = malloc(M*N*P*sizeof(size_t));
-    size_t * Lp = malloc(M*N*P*sizeof(size_t));
+    uint64_t * L = malloc(M*N*P*sizeof(uint64_t));
+    uint64_t * Lp = malloc(M*N*P*sizeof(uint64_t));
 
-    size_t nb_labs = 0; /* Number of labels used */
-    for(size_t kk = 0; kk < M*N*P; kk++)
+    uint64_t nb_labs = 0; /* Number of labels used */
+    for(uint64_t kk = 0; kk < M*N*P; kk++)
     {
         if(PSI[kk] == 0)
         {
-            size_t nL = 0;
-            int lab = get_stream(kk,
+            uint64_t nL = 0;
+            int64_t lab = get_stream(kk,
                                  F, F0,
                                  PSI,
                                  M, N, P,
@@ -294,7 +298,7 @@ int * watershed_cuts(const double * F,
                     // printf("Lab=%d\n", lab);
                 }
 
-                for(size_t ll = 0; ll < nL; ll++)
+                for(uint64_t ll = 0; ll < nL; ll++)
                 {
                     PSI[L[ll]] = lab;
                 }
@@ -305,5 +309,26 @@ int * watershed_cuts(const double * F,
     free(F0);
     free(L);
     free(Lp);
-    return PSI;
+    return EXIT_SUCCESS;
+}
+
+int64_t *
+watershed_cuts(const double * I,
+               uint64_t M, uint64_t N, uint64_t P)
+{
+    if(M*N*P == 0)
+    {
+        return NULL;
+    }
+    int64_t * W = calloc(M*N*P, sizeof(int64_t));
+    if(W == NULL)
+    {
+        return NULL;
+    }
+    if(watershed_cuts_pre(W, I, M, N, P))
+    {
+        free(W);
+        return NULL;
+    }
+    return W;
 }

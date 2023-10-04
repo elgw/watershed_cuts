@@ -165,6 +165,7 @@ title('input')
 l(2) = subplot(2,2,2); imagesc(watershed(I)), axis image
 title('watershed')
 w2=watershed_cuts(I);
+w2 = int32(I);
 l(3) = subplot(2,2,3); imagesc(w2), axis image
 title('watershed cuts');
 ec = w2-imerode(w2, [0, 1, 0 ; 1 1 1; 0 1 0]);

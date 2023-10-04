@@ -11,7 +11,7 @@ clockdiff(struct timespec* end, struct timespec * start)
 }
 
 
-static void show_int_matrix(const int * I, size_t M, size_t N)
+static void show_int_matrix(const int64_t * I, size_t M, size_t N)
 {
     if(M*N > 100)
         return;
@@ -20,7 +20,7 @@ static void show_int_matrix(const int * I, size_t M, size_t N)
     {
         for(size_t ll = 0 ; ll < N; ll++)
         {
-            printf("%d ", I[kk + M*ll]);
+            printf("%ld ", I[kk + M*ll]);
         }
         printf("\n");
     }
@@ -69,7 +69,7 @@ int main(int argc, char ** argv)
     show_double_matrix(F, M, N);
     struct timespec tstart, tend;
     clock_gettime(CLOCK_REALTIME, &tstart);
-    int * W = watershed_cuts(F, M, N, P);
+    int64_t * W = watershed_cuts(F, M, N, P);
     clock_gettime(CLOCK_REALTIME, &tend);
     show_int_matrix(W, M, N);
     free(W);

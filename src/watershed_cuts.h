@@ -52,19 +52,25 @@
 extern "C"{
 #endif
 
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
 #define WATERSHED_CUTS_VERSION_MAJOR "0"
 #define WATERSHED_CUTS_VERSION_MINOR "0"
-#define WATERSHED_CUTS_VERSION_PATCH "2"
+#define WATERSHED_CUTS_VERSION_PATCH "3"
 #define watershed_cuts_version WATERSHED_CUTS_VERSION_MAJOR "." \
     WATERSHED_CUTS_VERSION_MINOR "."                            \
     WATERSHED_CUTS_VERSION_PATCH
 
-int *
+int64_t *
 watershed_cuts(const double * I,
-               size_t M, size_t N, size_t P);
+               uint64_t M, uint64_t N, uint64_t P);
+
+int
+watershed_cuts_pre(int64_t * W, const double * I,
+                   uint64_t M, uint64_t N, uint64_t P);
+
 
 #ifdef __cplusplus
 }

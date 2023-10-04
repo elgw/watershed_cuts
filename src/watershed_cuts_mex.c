@@ -35,16 +35,10 @@ void mexFunction(int nlhs, mxArray *plhs[],int nrhs, const mxArray *prhs[])
 
     double * I = mxGetPr(prhs[0]);
 
-    plhs[0] = mxCreateNumericArray(ndims, dims, mxDOUBLE_CLASS, mxREAL);
-    double * _D = mxGetPr(plhs[0]);
+    plhs[0] = mxCreateNumericArray(ndims, dims, mxINT64_CLASS, mxREAL);
+    int64_t * W = (int64_t*) mxGetPr(plhs[0]);
 
-    int * W = watershed_cuts(I, M, N, P);
-
-    for(size_t kk = 0; kk<M*N*P; kk++)
-    {
-        _D[kk] = W[kk];
-    }
-    free(W);
+    watershed_cuts_pre(W, I, M, N, P);
 
     return;
 }
