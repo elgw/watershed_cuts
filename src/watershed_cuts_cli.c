@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <time.h>
 #include "watershed_cuts.h"
@@ -61,6 +62,8 @@ int main(int argc, char ** argv)
 
     printf("Input size: [%zu x %zu x %zu]\n", M, N, P);
     double * F = malloc(M*N*P*sizeof(double));
+    assert(F != NULL);
+
     for(size_t kk = 0; kk<M*N*P; kk++)
     {
         F[kk] = 0; //(double) rand() / (double) RAND_MAX;
@@ -84,6 +87,7 @@ int main(int argc, char ** argv)
     clock_gettime(CLOCK_REALTIME, &tstart);
     W = watershed_cuts(F, M, N, P);
     clock_gettime(CLOCK_REALTIME, &tend);
+    free(F);
     show_int_matrix(W, M, N);
     free(W);
     printf("Random input, Took %f s\n", clockdiff(&tend, &tstart));
